@@ -39,19 +39,50 @@ logoutButton.addEventListener('click',()=>{
     return window.location.href='/';
 })
 
-function postToDatabase(event){
+async function postToDatabase(event){
     event.preventDefault();
     const formData = new FormData(event.target);
+    const authToken = localStorage.getItem('auth_token');
 
-    console.log(currentAccount);
-    console.log(formData.get('title'));
-    console.log(formData.get('message'));
     const postDetails = {
         email: currentAccount,
         title: formData.get('title'),
         message: formData.get('message')
     }
+    let response = await fetch('/makepost',{
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'authorization': 'Bearer ' + authToken
+        },
+
+        body: JSON.stringify(postDetails)
+    })
+    let data = await response.json();
+    console.log(data);
     console.log(postDetails);
+
+    let postSegment = document.getElementById('post-segment');
+    postSegment.innerHTML += `
+    <div id='post'>
+        <h5 id='title'> ${data.title} </h5>
+        <p id='poster'> ${data.email}</p>
+        <p id='message'> ${data.message}</p>
+    </div>
+    `
+
+    /*
+    div(id='post')
+      h5(id='title') Example post 
+      p(id='poster') #[strong random@account.com]
+      p(id='message') I'm having problems with this code
+      p(id='code'
+    */
+
 }
+//InnerHTML:llä + appendiä
+
+//Lisää code modeliin ja sivulle
+
 
 checkAuthToken();

@@ -18,7 +18,7 @@ var opts = {}
 opts.secretOrKey = 'SECRETPASSWORD';
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 const Accounts = require('../models/Accounts.js');
-const { validate } = require('../models/Accounts.js');
+const Posts = require('../models/Posts.js');
 
 //Session setup
 /*router.use(session({
@@ -132,6 +132,21 @@ function checkIfLoggedIn(req,res,next){
     next();
 }
 
+router.post('/makepost',validateToken,(req,res,next)=>{
+    console.log(req.body);
+    Posts.create(
+        {
+            email: req.body.email,
+            title: req.body.title,
+            message: req.body.message
+        },
+        (err)=>{
+            if(err) throw err;
+            console.log('Post created');
+            return res.status(200).json({message: 'Post created'});
+        }
+    )
+})
 
 router.get('/getaccount', validateToken, (req,res,next)=>{
     console.log(req.user);
