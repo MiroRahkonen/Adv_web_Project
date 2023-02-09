@@ -1,0 +1,41 @@
+html{
+  background-color: #181a1b;
+  color: white;
+}
+
+body {
+  color: white;
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+textarea{
+  background-color: white;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.error {
+  color: red;
+}
+
+.navbar-button{
+  margin: 5px;
+}
+
+.nav-wrapper{
+  background-color: #b11016;
+}
+
+#post{
+  margin-top: 50px;
+  padding: 7px;
+  border-radius: 5px;
+  border: 2px solid gray;
+}
+
+.code{
+  color: blue;
+}

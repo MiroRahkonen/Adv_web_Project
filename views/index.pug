@@ -1,5 +1,27 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to Express
+  nav
+    div(class='nav-wrapper')
+      ul(id='navbar-links' class='right hide-on-med-and-down')
+        li
+          button(id='register-button' class='btn navbar-button' onclick='window.location="/register"') Register 
+        li
+          button(id='login-button' class='btn navbar-button' onclick='window.location="/login"') Login
+        li(id='logout-segment' hidden)
+          button(id='logout-button' class='btn navbar-button') Logout
+  
+  div(id='create-post-segment' class='create-post' hidden)
+    form(id='post-form')
+      textarea(id='title' form='post-form' class='materialize-textarea' placeholder='Post title' maxlength='50')
+      textarea(id='message' form='post-form' class='materialize-textarea' placeholder='Write your message here...')
+      input(type='submit' class='btn')
+
+  div(id='post-segment' class='z-depth-3')
+    div(id='post')
+      h5(id='title') Some random question 
+      p(id='poster') #[strong joku@tyyppi.com]
+      p(id='message') I'm having problems with this code
+      p(id='code' class='code') function print(){  <br> &emsp; print('Hello world');<br>}<br>print();
+
+  script(src='/javascripts/index.js' defer)

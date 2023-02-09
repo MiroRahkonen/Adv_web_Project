@@ -1,9 +1,21 @@
 extends layout 
 block content 
-    h1 Register
-    form(action="/user/register" method="POST")
-        label(for="email") E-mail
-        input(type="text" name="password" id="password" required)
-        label(for="password") Password
-        input(type="text" name="password" id="password" required)
-        button(class="btn" type="submit") Register
+    nav
+        div(class='nav-wrapper')
+          ul(id='navbar-links' class='right hide-on-med-and-down')
+            li
+              button(id='register-button' class='btn navbar-button' onclick='window.location="/register"') Register 
+            li
+              button(id='login-button' class='btn navbar-button' onclick='window.location="/login"') Login
+
+    h1 Register 
+    p(id="error-message" class='error')
+    form(action='' id='register-form' method='POST')
+        label(for='email') E-mail 
+        input(type='email' name='email' id='email' required)
+        label(for='password') Password 
+        input(type='password' name='password' id='password' required)
+        br
+        br
+        input(class='btn' type='submit' value='Register')
+    script(src='/javascripts/register.js' defer) 
