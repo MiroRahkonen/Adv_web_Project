@@ -21,7 +21,7 @@ const Accounts = require('../models/Accounts.js');
 const { validate } = require('../models/Accounts.js');
 
 //Session setup
-router.use(session({
+/*router.use(session({
     secret: 'SECRETPASSWORD',
     resave: false,
     saveUninitialized: true
@@ -35,13 +35,13 @@ passport.use(new JwtStrategy(opts,(jwt_payload,done)=>{
         if(account) return done(null,account);    //Account found, return account
         else return done(null,false);       //Account not found, return false
     })
-}))
+}))*/
 
 
 
 
 //Register
-router.get('/register',(req,res,next)=>{
+router.get('/register',checkIfLoggedIn,(req,res,next)=>{
     res.render('register');
 })
 
@@ -89,7 +89,7 @@ router.post('/register',upload.none(),
 })
 
 //  Login
-router.get('/login',(req,res,next)=>{
+router.get('/login',checkIfLoggedIn,(req,res,next)=>{
     return res.render('login');
 })
 
@@ -124,6 +124,14 @@ router.post('/login', upload.none(), (req,res,next)=>{
 router.get('/',(req,res,next)=>{
     return res.render('index');
 })
+
+//Functions
+function checkIfLoggedIn(req,res,next){
+    //const authToken = localStorage.getItem('auth_token');
+    //console.log(authToken);
+    next();
+}
+
 
 router.get('/getaccount', validateToken, (req,res,next)=>{
     console.log(req.user);

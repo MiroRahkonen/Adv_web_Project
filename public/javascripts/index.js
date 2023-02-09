@@ -4,9 +4,9 @@ const loginButton = document.getElementById('login-button');
 const registerButton = document.getElementById('register-button')
 const newpostSegment = document.getElementById('create-post-segment');
 const postForm = document.getElementById('post-form');
-postForm.addEventListener('submit',createPost);
+postForm.addEventListener('submit',postToDatabase);
 
-let currentAccountEmail;
+let currentAccount;
 
 
 
@@ -30,7 +30,7 @@ async function checkAuthToken(){
         }
     })
     let data = await response.json();
-    currentAccountEmail = data.email;
+    currentAccount = data.email;
 }
 
 
@@ -39,9 +39,19 @@ logoutButton.addEventListener('click',()=>{
     return window.location.href='/';
 })
 
-function createPost(event){
+function postToDatabase(event){
     event.preventDefault();
-    console.log('AAAAAAAAA');
+    const formData = new FormData(event.target);
+
+    console.log(currentAccount);
+    console.log(formData.get('title'));
+    console.log(formData.get('message'));
+    const postDetails = {
+        email: currentAccount,
+        title: formData.get('title'),
+        message: formData.get('message')
+    }
+    console.log(postDetails);
 }
 
 checkAuthToken();

@@ -3,7 +3,7 @@ extends layout
 block content
   nav
     div(class='nav-wrapper')
-      ul(id='navbar-links' class='right hide-on-med-and-down')
+      ul(id='navbar-links' class='right')
         li
           button(id='register-button' class='btn navbar-button' onclick='window.location="/register"') Register 
         li
@@ -11,10 +11,11 @@ block content
         li(id='logout-segment' hidden)
           button(id='logout-button' class='btn navbar-button') Logout
   
+
   div(id='create-post-segment' class='create-post' hidden)
     form(id='post-form')
-      textarea(id='title' form='post-form' class='materialize-textarea' placeholder='Post title' maxlength='50')
-      textarea(id='message' form='post-form' class='materialize-textarea' placeholder='Write your message here...')
+      textarea(name='title' form='post-form' class='materialize-textarea' placeholder='Post title' maxlength='50')
+      textarea(name='message' form='post-form' class='materialize-textarea' placeholder='Write your message here...')
       input(type='submit' class='btn')
 
   div(id='post-segment' class='z-depth-3')
