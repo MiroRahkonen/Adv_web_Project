@@ -9,11 +9,11 @@ module.exports = (req,res,next) =>{
     else{
         token = null;
     }
-    if(token == null) {
-        return res.status(401)
+    if(token == null){
+        return res.sendStatus(401);
     }
     jwt.verify(token,process.env.SECRET,(err,user)=>{
-        if(err) return res.status(403)
+        if(err) return res.sendStatus(401);
         req.user = user
         next();
     })

@@ -8,18 +8,19 @@ block content
           button(id='register-button' class='btn navbar-button' onclick='window.location="/register"') Register 
         li
           button(id='login-button' class='btn navbar-button' onclick='window.location="/login"') Login
-        li(id='logout-segment' hidden)
+        li(id='logout-section')
           button(id='logout-button' class='btn navbar-button') Logout
-  
 
-  div(id='create-post-segment' class='create-post' hidden)
+  div(id='create-post-section' class='create-post')
+    p(id="error-message" class='error')
     form(id='post-form')
       textarea(name='title' form='post-form' class='materialize-textarea' placeholder='Post title' maxlength='50')
       textarea(name='message' form='post-form' class='materialize-textarea' placeholder='Write your message here...')
+      textarea(name='code' form='post-form' class='materialize-textarea' placeholder='Put your code here...')
       input(type='submit' class='btn')
 
-  div(id='post-segment' class='z-depth-3')
-    div(id='post')
+  div(id='post-section' class='z-depth-3')
+    //div(id='post')
       h5(id='title') Example post 
       p(id='poster') #[strong random@account.com]
       p(id='message') I'm having problems with this code

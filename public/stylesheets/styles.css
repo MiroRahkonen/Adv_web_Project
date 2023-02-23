@@ -29,14 +29,47 @@ a {
   background-color: #b11016;
 }
 
-#post{
-  margin-top: 50px;
+.post{
+  margin-top: 30px;
   padding: 7px;
   border-radius: 5px;
   border: 2px solid gray;
 }
 
+#username{
+  font-weight: bold;
+}
+
 .code{
   background-color: gray;
   color: black;
+}
+
+.comment-textarea{
+  background-color:#ffffff;
+  color:#000;
+}
+
+.post-link{
+  font-size: 30px;
+}
+
+.comment-section{
+  margin-top: 30px;
+  padding: 7px;
+  border-radius: 5px;
+  border: 1px solid gray;
+}
+
+.comment{
+  margin-bottom: 30px;
+  padding: 5px;
+  border: 1px solid gray;
+}
+
+a.btn{
+  margin-right: 5px;
+  width: 30px;
+  height: 30px;
+  align-items: center;
 }

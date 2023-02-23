@@ -5,7 +5,7 @@ block content
             ul(id='navbar-links' class='left')
                 li
                     button(id='index-button' class='btn navbar-button' onclick='window.location="/"') Home page
-            ul(id='navbar-links' class='right hide-on-med-and-down')
+            ul(id='navbar-links' class='right')
                 li
                     button(id='register-button' class='btn navbar-button' onclick='window.location="/register"') Register 
                 li
@@ -14,11 +14,13 @@ block content
     h1 Register 
     p(id="error-message" class='error')
     form(action='' id='register-form' method='POST')
-        label(for='email') E-mail 
+        label(for='username') Username (minimum 4 letters)
+        input(name='username' id='username' required)
+        label(for='email') E-mail (must be valid e-mail)
         input(type='email' name='email' id='email' required)
-        label(for='password') Password 
+        label(for='password') Password (requires: 6 characters with uppercase and lowercase letters with at least 1 number)
         input(type='password' name='password' id='password' required)
         br
         br
         input(class='btn' type='submit' value='Register')
-    script(src='/javascripts/register.js' defer) 
+    script(src='/javascripts/register.js' defer)

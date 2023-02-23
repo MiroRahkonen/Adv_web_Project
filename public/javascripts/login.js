@@ -13,9 +13,10 @@ loginForm.addEventListener('submit',async (event)=>{
     console.log(data);
     if(response.status != 200){
         console.log('Invalid credentials');
-        error_message.innerHTML = data.message;
+        errorMessage.innerHTML = data.message;
     }
     if(data.token){
+        console.log(data.token);
         storeAuthToken(data.token);
         return window.location.href='/';
     }

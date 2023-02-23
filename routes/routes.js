@@ -1,25 +1,8 @@
-require('dotenv').config();
-const jwt = require('jsonwebtoken');
-const validateToken = require('../authentication/validateToken.js');
-var express = require('express');
-var router = express.Router();
-const bcrypt = require('bcryptjs');
-const mongoose = require('mongoose');
-const {body, validationResult} = require('express-validator');
-const {check} = require('express-validator');
-const passport = require('passport');
-const multer = require('multer');
-const storage = multer.memoryStorage();
-const upload = multer({storage});
-const session = require('express-session');
-var JwtStrategy = require('passport-jwt').Strategy,
+/*var JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt;
 var opts = {}
 opts.secretOrKey = 'SECRETPASSWORD';
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-const Accounts = require('../models/Accounts.js');
-const Posts = require('../models/Posts.js');
-
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();*/
 //Session setup
 /*router.use(session({
     secret: 'SECRETPASSWORD',
@@ -37,18 +20,52 @@ passport.use(new JwtStrategy(opts,(jwt_payload,done)=>{
     })
 }))*/
 
+require('dotenv').config();
+const jwt = require('jsonwebtoken');
+const validateToken = require('../authentication/validateToken');
+var express = require('express');
+var router = express.Router();
+const bcrypt = require('bcryptjs');
+const {body, validationResult} = require('express-validator');
+const {check} = require('express-validator');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({storage});
 
+const Accounts = require('../models/Accounts.js');
+const Posts = require('../models/Posts.js');
+const Comments = require('../models/Comments');
 
+// Index page
+router.get('/',(req,res,next)=>{
+    return res.render('index');
+})
 
-//Register
-router.get('/register',checkIfLoggedIn,(req,res,next)=>{
+//Register page
+router.get('/register', (req,res,next)=>{
+    if(req.user != null){
+        return res.redirect('/');
+    }
     res.render('register');
 })
 
+// Login page
+router.get('/login',(req,res,next)=>{
+    return res.render('login');
+})
+
+// Post page
+router.get('/post/:postid',(req,res,next)=>{
+    res.render('post');
+})
+
+
+// Register
 //I got help with checking the password using RegEx expressions from these stackoverflow threads
 //https://stackoverflow.com/questions/1559751
 //https://stackoverflow.com/questions/42353753
 router.post('/register',upload.none(),
+    body('username').isLength({min: 4}),
     body('email').isEmail(),
     check('password')
     .isLength({min: 6})
@@ -59,7 +76,6 @@ router.post('/register',upload.none(),
         //Checking if email and password are valid
         const errors = validationResult(req);
         if(!errors.isEmpty()){
-            console.log(errors)
             return res.status(400).json({message: "Password isn't strong enough"});
         }
 
@@ -75,12 +91,12 @@ router.post('/register',upload.none(),
                 const encryptedPassword = hash;
                 Accounts.create(
                     {
+                        username: req.body.username,
                         email: req.body.email,
                         password: encryptedPassword
                     },
                     (err)=>{
                         if(err) throw err;
-                        console.log('Account created');
                         return res.status(200).json({message: 'Account created'});
                     }
                 )
@@ -88,11 +104,8 @@ router.post('/register',upload.none(),
         })
 })
 
-//  Login
-router.get('/login',checkIfLoggedIn,(req,res,next)=>{
-    return res.render('login');
-})
 
+// Login
 router.post('/login', upload.none(), (req,res,next)=>{
     Accounts.findOne({email: req.body.email},(err,account)=>{
         if(err) throw err;
@@ -103,13 +116,14 @@ router.post('/login', upload.none(), (req,res,next)=>{
             if(!success) return res.status(400).json({message: 'Password incorrect'});
 
             const jwtPayload = {
-                email: account.email
+                email: account.email,
+                username: account.username
             }
             jwt.sign(
                 jwtPayload,
                 process.env.SECRET,
                 {
-                    expiresIn: 1200
+                    expiresIn: 12000
                 },
                 (err,token)=>{
                     if(err) throw err;
@@ -120,37 +134,117 @@ router.post('/login', upload.none(), (req,res,next)=>{
     })
 })
 
-// Index page
-router.get('/',(req,res,next)=>{
-    return res.render('index');
-})
 
-//Functions
-function checkIfLoggedIn(req,res,next){
-    //const authToken = localStorage.getItem('auth_token');
-    //console.log(authToken);
-    next();
-}
-
-router.post('/makepost',validateToken,(req,res,next)=>{
-    console.log(req.body);
+// Creating a post
+router.post('/post',validateToken,(req,res,next)=>{
     Posts.create(
         {
-            email: req.body.email,
+            username: req.user.username,
+            email: req.user.email,
             title: req.body.title,
-            message: req.body.message
+            message: req.body.message,
+            code: req.body.code
         },
         (err)=>{
             if(err) throw err;
-            console.log('Post created');
             return res.status(200).json({message: 'Post created'});
         }
     )
 })
 
-router.get('/getaccount', validateToken, (req,res,next)=>{
-    console.log(req.user);
+//Editing a post
+router.put('/post',(req,res,next)=>{
+    console.log(req.body);
+    Posts.findOne({_id: req.body.postID},(err,post)=>{
+        console.log(post);
+        if(err) throw err;
+        post.title = req.body.title;
+        post.message = req.body.message;
+        post.code = req.body.code;
+        post.save();
+    })
+    res.json('Changes saved');
+})
+
+//Deleting a post and all its comments
+router.delete('/post',(req,res,next)=>{
+    Posts.deleteOne({_id: req.body.postID},(err)=>{
+        if(err) return res.status(400).json('Error deleting post');
+    })
+
+    Comments.deleteMany({postID: req.body.postID},(err)=>{
+        if(err) return res.status(400).json('Error deleting comments');
+    })
+    return res.json('Post and comments deleted');
+})
+
+
+//Creating a comment
+router.post('/comment',validateToken,(req,res,next)=>{
+    Comments.create(
+        {
+            postID: req.body.postID,
+            username: req.body.username,
+            message: req.body.message,
+            code: req.body.code,
+            likes: 0
+        },
+        (err)=>{
+            if(err) throw err;
+            return res.status(200).json({message: 'Post created'});
+        }
+    )
+})
+
+//Editing a comment
+router.put('/comment',(req,res,next)=>{
+    Comments.findOne({_id: req.body.commentID},(err,comment)=>{
+        if(err) throw err;
+        comment.message = req.body.message;
+        comment.code = req.body.code;
+        console.log(comment);
+        comment.save();
+    })
+    res.json('Changes saved');
+})
+
+//Deleting a comment
+router.delete('/comment',(req,res,next)=>{
+    Comments.deleteOne({_id: req.body.commentID},(err)=>{
+        if(err) return res.status(400).json('Error deleting comment');
+    })
+    return res.json('Comment deleted');
+})
+
+
+// Functions
+router.get('/account', validateToken, (req,res,next)=>{
     res.json(req.user);
 })
+
+router.get('/posts',(req,res,next)=>{
+    Posts.find({},(err,posts)=>{
+        if(err) return next(err);
+        res.json(posts);
+    })
+})
+
+router.get('/getpost/:postid',(req,res,next)=>{
+    Posts.findOne({_id: req.params.postid},(err,post)=>{
+        if(err) throw err;
+        res.json(post);
+    })
+})
+
+router.get('/comments/:postid',(req,res,next)=>{
+    Comments.find({postID: req.params.postid},(err,comments)=>{
+        if(err) throw err;
+        res.json(comments);
+    })
+})
+
+
+
+
 
 module.exports = router;

@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose');
+mongoose.set('strictQuery', true);
 
 var routesRouter = require('./routes/routes')
 
@@ -39,7 +40,7 @@ app.use(function(err, req, res, next) {
 });
 
 //Mongoose setup
-const dbURL = 'mongodb://localhost:27017/project';
+const dbURL = 'mongodb://127.0.0.1:27017/project';
 mongoose.connect(dbURL);
 mongoose.Promise = Promise;
 const mongoDB = mongoose.connection;
