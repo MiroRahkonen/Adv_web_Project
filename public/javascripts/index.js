@@ -41,13 +41,13 @@ async function initializeHeader(){
 }
 
 async function initializePosts(){
+    postSection.innerHTML = '';
     response = await fetch('/posts',{
         method: 'GET'
     })
     data = await response.json();
     posts = data;
     posts.forEach((post,index)=>{
-        console.log(post);
         let editbuttons = '';
         if(post.username === currentUsername){
             editbuttons = `
@@ -83,7 +83,7 @@ async function createPost(event){
     const authToken = localStorage.getItem('auth_token');
     if(!authToken){
         errorMessage.innerHTML = 'Unauthorized';
-        initializePage();
+        location.reload();
         return;
     }
 
@@ -92,7 +92,7 @@ async function createPost(event){
         message: formData.get('message'),
         code: formData.get('code')
     }
-    response = await fetch('/post',{
+    let response = await fetch('/post',{
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -100,30 +100,28 @@ async function createPost(event){
         },
         body: JSON.stringify(postDetails)
     })
-    console.log('In post')
+    let data = await response.json();
     if(response.status !== 200){
         return errorMessage.innerHTML = 'Error creating the post';
     }
-    else{
-        location.reload();
-    }
+    //Redirecting to the new post's page
+    return window.location.replace(`/post/${data._id}`);
 }
 
 async function editPost(i){
-    console.log(posts[i]);
     let postContainer = document.getElementById(i);
     postContainer.innerHTML = `
         <div>
-            <form action='' id='edit-post-form'>
-                <textarea name='title' form='edit-post-form' class='materialize-textarea' maxlength='50'>${posts[i].title}</textarea>
+            <form action='' id='edit-post-form-${i}'>
+                <textarea name='title' form='edit-post-form-${i}' class='materialize-textarea' maxlength='50'>${posts[i].title}</textarea>
                 <p id='username'>${currentUsername}</p>
-                <textarea name='message' form='edit-post-form' class='materialize-textarea' placeholder='Write your message here...'>${posts[i].message}</textarea>
-                <textarea name='code' form='edit-post-form' class='materialize-textarea' placeholder='Put useful code here...'>${posts[i].code}</textarea>
+                <textarea name='message' form='edit-post-form-${i}' class='materialize-textarea' placeholder='Write your message here...'>${posts[i].message}</textarea>
+                <textarea name='code' form='edit-post-form-${i}' class='materialize-textarea' placeholder='Put useful code here...'>${posts[i].code}</textarea>
                 <input type='submit' class='btn'>
             </form>
         </div>
     `
-    document.getElementById('edit-post-form').addEventListener('submit',async (event)=>{
+    document.getElementById(`edit-post-form-${i}`).addEventListener('submit',async (event)=>{
         event.preventDefault();
         const formData = new FormData(event.target);
         const postDetails = {
@@ -140,13 +138,12 @@ async function editPost(i){
             },
             body: JSON.stringify(postDetails)
         })
-        return location.reload();
+        return initializePosts();
     })
 }
 
 
 async function deletePost(i){
-    console.log(posts[i]);
     let response = await fetch('/post',{
         method: 'DELETE',
         headers: {

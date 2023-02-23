@@ -145,18 +145,16 @@ router.post('/post',validateToken,(req,res,next)=>{
             message: req.body.message,
             code: req.body.code
         },
-        (err)=>{
+        (err,post)=>{
             if(err) throw err;
-            return res.status(200).json({message: 'Post created'});
+            return res.json(post);
         }
     )
 })
 
 //Editing a post
 router.put('/post',(req,res,next)=>{
-    console.log(req.body);
     Posts.findOne({_id: req.body.postID},(err,post)=>{
-        console.log(post);
         if(err) throw err;
         post.title = req.body.title;
         post.message = req.body.message;
@@ -202,7 +200,6 @@ router.put('/comment',(req,res,next)=>{
         if(err) throw err;
         comment.message = req.body.message;
         comment.code = req.body.code;
-        console.log(comment);
         comment.save();
     })
     res.json('Changes saved');

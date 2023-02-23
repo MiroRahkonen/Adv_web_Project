@@ -3,6 +3,7 @@ const logoutButton = document.getElementById('logout-button');
 const loginButton = document.getElementById('login-button');
 const registerButton = document.getElementById('register-button');
 const post = document.getElementById('post');
+const createCommentSection = document.getElementById('create-comment');
 const commentForm = document.getElementById('comment-form');
 commentForm.addEventListener('submit',postComment);
 const commentSection = document.getElementById('comment-section');
@@ -24,13 +25,9 @@ async function initializeHeader(){
 
     if(!authToken){
         logoutSection.style.display = 'none';
-        
-        loginButton.style.display = 'inline';
-        registerButton.style.display = 'inline';
+        createCommentSection.style.display = 'none';
     }
     else{
-        logoutSection.style.display = 'inline';
-
         loginButton.style.display = 'none';
         registerButton.style.display = 'none';
         let response = await fetch('/account',{
@@ -61,6 +58,7 @@ async function initializePost(){
 }
 
 async function initializeComments(){
+    commentSection.innerHTML = '';
     let response = await fetch(`/comments/${postID}`,{
         method: 'GET'
     })
@@ -116,24 +114,24 @@ async function postComment(event){
         return errorMessage.innerHTML = 'Error creating the post';
     }
     else{
-        location.reload();
+        initializeComments();
     }
 }
 
 async function editComment(i){
-    console.log(comments[i]);
+    console.log(comments[i])
     let commentContainer = document.getElementById(i);
     commentContainer.innerHTML = `
         <div>
             <p id='username'>${currentUsername}</p>
-            <form action='' id='edit-comment-form'>
-                <textarea name='message' form='edit-comment-form' class='materialize-textarea' placeholder='Write your message here...'>${comments[i].message}</textarea>
-                <textarea name='code' form='edit-comment-form' class='materialize-textarea' placeholder='Put useful code here...'>${comments[i].code}</textarea>
+            <form action='' id='edit-comment-form-${i}'>
+                <textarea name='message' form='edit-comment-form-${i}' class='materialize-textarea' placeholder='Write your message here...'>${comments[i].message}</textarea>
+                <textarea name='code' form='edit-comment-form-${i}' class='materialize-textarea' placeholder='Put useful code here...'>${comments[i].code}</textarea>
                 <input type='submit' class='btn'>
             </form>
         </div>
     `
-    document.getElementById('edit-comment-form').addEventListener('submit',async (event)=>{
+    document.getElementById(`edit-comment-form-${i}`).addEventListener('submit',async (event)=>{
         event.preventDefault();
         const formData = new FormData(event.target);
         const commentDetails = {
@@ -149,12 +147,11 @@ async function editComment(i){
             },
             body: JSON.stringify(commentDetails)
         })
-        return location.reload();
+        return initializeComments();
     })
 }
 
 async function deleteComment(i){
-    console.log(comments[i]);
     let response = await fetch('/comment',{
         method: 'DELETE',
         headers: {
