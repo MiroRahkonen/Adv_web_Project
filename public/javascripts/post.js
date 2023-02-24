@@ -106,7 +106,7 @@ async function initializeComments(){
             ${editbuttons}
             <p id='username'>Username: ${comment.username}</p>
             <p id='message'>${comment.message}</p>
-            <p id='code' class='code'>${comment.code}</p>
+            <pre id='code' class='code'>${comment.code}</pre>
         </div>
         `
     })

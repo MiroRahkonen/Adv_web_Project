@@ -1,25 +1,3 @@
-/*var JwtStrategy = require('passport-jwt').Strategy,
-    ExtractJwt = require('passport-jwt').ExtractJwt;
-var opts = {}
-opts.secretOrKey = 'SECRETPASSWORD';
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();*/
-//Session setup
-/*router.use(session({
-    secret: 'SECRETPASSWORD',
-    resave: false,
-    saveUninitialized: true
-}))
-router.use(passport.initialize());
-router.use(passport.session());
-
-passport.use(new JwtStrategy(opts,(jwt_payload,done)=>{
-    Accounts.findOne({email: jwt_payload.email},(err,account)=>{
-        if(err) return done(err,false);     //There was an error
-        if(account) return done(null,account);    //Account found, return account
-        else return done(null,false);       //Account not found, return false
-    })
-}))*/
-
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const validateToken = require('../authentication/validateToken');
