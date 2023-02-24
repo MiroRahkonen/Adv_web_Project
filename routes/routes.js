@@ -14,31 +14,28 @@ const Accounts = require('../models/Accounts.js');
 const Posts = require('../models/Posts.js');
 const Comments = require('../models/Comments');
 
-// Index page
+//Navigating to index page
 router.get('/',(req,res,next)=>{
     return res.render('index');
 })
 
-//Register page
+//Navigating to register page
 router.get('/register', (req,res,next)=>{
-    if(req.user != null){
-        return res.redirect('/');
-    }
     res.render('register');
 })
 
-// Login page
+// Navigating to login page
 router.get('/login',(req,res,next)=>{
     return res.render('login');
 })
 
-// Post page
+// Navigating to post page
 router.get('/post/:postid',(req,res,next)=>{
     res.render('post');
 })
 
 
-// Register
+// Register a new account
 //I got help with checking the password using RegEx expressions from these stackoverflow threads
 //https://stackoverflow.com/questions/1559751
 //https://stackoverflow.com/questions/42353753
@@ -63,7 +60,8 @@ router.post('/register',upload.none(),
                 //Account with email already exists
                 return res.status(403).json({message: 'Account with e-mail already exists'});
             }
-
+            /*Encrypted hash is created from the password with bcrypt, 
+            and the password is stored in an encrypted form in the database*/
             bcrypt.hash(req.body.password,10,(err,hash)=>{
                 if(err) throw err;
                 const encryptedPassword = hash;
@@ -167,7 +165,7 @@ router.post('/comment',validateToken,(req,res,next)=>{
         },
         (err)=>{
             if(err) throw err;
-            return res.status(200).json({message: 'Post created'});
+            return res.status(200).json({message: 'Comment created'});
         }
     )
 })
@@ -183,6 +181,7 @@ router.put('/comment',(req,res,next)=>{
     res.json('Changes saved');
 })
 
+//An upvote/downvote is submitted for a comment
 router.put('/votecomment',(req,res,next)=>{
     Comments.findOne({_id: req.body.commentID},(err,comment)=>{
         if(err) res.status(400).json('Upvote failed.');
@@ -211,10 +210,13 @@ router.delete('/comment',(req,res,next)=>{
 
 
 // Functions
+
+//Getting the logged in user's credentials
 router.get('/account', validateToken, (req,res,next)=>{
     res.json(req.user);
 })
 
+//Fetching all the posts for the index-page
 router.get('/posts',(req,res,next)=>{
     Posts.find({},(err,posts)=>{
         if(err) return next(err);
@@ -222,6 +224,7 @@ router.get('/posts',(req,res,next)=>{
     })
 })
 
+//Fetching a specific post for the post-page
 router.get('/getpost/:postid',(req,res,next)=>{
     Posts.findOne({_id: req.params.postid},(err,post)=>{
         if(err) throw err;
@@ -229,15 +232,12 @@ router.get('/getpost/:postid',(req,res,next)=>{
     })
 })
 
+//Fetching all comments for a post
 router.get('/comments/:postid',(req,res,next)=>{
     Comments.find({postID: req.params.postid},(err,comments)=>{
         if(err) throw err;
         res.json(comments);
     })
 })
-
-
-
-
 
 module.exports = router;

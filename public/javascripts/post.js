@@ -40,6 +40,7 @@ async function initializeHeader(){
     }
 }
 
+/*Used to create the post dynamically by fetching the data from the database*/
 async function initializePost(){
     let response = await fetch(`/getpost/${postID}`,{
         method: 'GET',
@@ -57,6 +58,8 @@ async function initializePost(){
     </div>`
 }
 
+/*This creates elements for each of the comments in the database, and 
+creates all the buttons and eventlisteners for the buttons*/
 async function initializeComments(){
     commentSection.innerHTML = '';
     let response = await fetch(`/comments/${postID}`,{
@@ -66,6 +69,9 @@ async function initializeComments(){
     comments = data;
     comments.forEach((comment,index)=>{
         let editbuttons = ''
+        /*Editbuttons includes all the functionality that the current user
+        should have in interacting with the comment. The poster can edit and delete it
+        and another logged in user can upvote it. Unlogged in users can't interact with it*/
         if(comment.username === currentUsername){
             editbuttons = `
             <div>
@@ -98,7 +104,6 @@ async function initializeComments(){
                 </div>`
             }
         }
-        
 
         commentSection.innerHTML += `
         
@@ -135,6 +140,8 @@ async function postComment(event){
     if(response.status !== 200){
         return errorMessage.innerHTML = 'Error creating the post';
     }
+    /*In case the comment was successfully posted, the comments section is initialized again
+    to show the new comment*/
     else if(response.status === 200){
         initializeComments();
     }
@@ -172,8 +179,8 @@ async function editComment(i){
     })
 }
 
-
-
+/*Called when the upvote button hasn't been previously pressed, and
+upvote is added to the comment's counter*/
 async function upvote(i){
     let commentDetails = {
         commentID: comments[i]._id,
@@ -194,6 +201,8 @@ async function upvote(i){
     }
 }
 
+/*Called when the upvote button has been previously pressed and the upvote is
+removed from the current user, reducing the upvote count by 1*/
 async function removeUpvote(i){
     let commentDetails = {
         commentID: comments[i]._id,

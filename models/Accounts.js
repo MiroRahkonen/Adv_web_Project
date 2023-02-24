@@ -5,7 +5,6 @@ let accountSchema = new Schema({
     username: String,
     email: String,
     password: String
-    /*etc*/
 });
 
 module.exports = mongoose.model('accounts',accountSchema);

@@ -17,6 +17,8 @@ async function initializeHeader(){
     const authToken = localStorage.getItem('auth_token');
     let response, data;
 
+    /*Checking if user is logged in, and hiding or showing certain
+    parts of the website that the user should have access to*/
     if(!authToken){
         logoutSection.style.display = 'none';
         newpostSection.style.display = 'none';
@@ -41,6 +43,8 @@ async function initializeHeader(){
 }
 
 async function initializePosts(){
+    /*postSection is used to store the HTML of all posts
+    and it is edited by adding to it with innerHTML += command*/
     postSection.innerHTML = '';
     response = await fetch('/posts',{
         method: 'GET'
@@ -48,6 +52,8 @@ async function initializePosts(){
     data = await response.json();
     posts = data;
     posts.forEach((post,index)=>{
+        /*editbuttons includes the editing and deleting buttons, and they
+        are shown only if the current user is the one that posted them originally*/
         let editbuttons = '';
         if(post.username === currentUsername){
             editbuttons = `
@@ -82,6 +88,8 @@ async function createPost(event){
     const formData = new FormData(event.target);
     const authToken = localStorage.getItem('auth_token');
     if(!authToken){
+        /* If the user isn't logged in but can still see the interface for creating a post,
+        The posting is denied and the webpage is reloaded*/
         errorMessage.innerHTML = 'Unauthorized';
         location.reload();
         return;
@@ -101,14 +109,17 @@ async function createPost(event){
         body: JSON.stringify(postDetails)
     })
     let data = await response.json();
+    //If the response wasn't successful, an error message is shown
     if(response.status !== 200){
         return errorMessage.innerHTML = 'Error creating the post';
     }
-    //Redirecting to the new post's page
+    //Redirecting to the new post's page if it was successful
     return window.location.replace(`/post/${data._id}`);
 }
 
 async function editPost(i){
+    /*Here we edit the existing post's container and a new form is created inside 
+    where the data can be changed*/
     let postContainer = document.getElementById(i);
     postContainer.innerHTML = `
         <div>
@@ -121,6 +132,8 @@ async function editPost(i){
             </form>
         </div>
     `
+    /*Adding an eventlistener to the editing form and the edited data
+    is sent to the server when it is submitted*/
     document.getElementById(`edit-post-form-${i}`).addEventListener('submit',async (event)=>{
         event.preventDefault();
         const formData = new FormData(event.target);

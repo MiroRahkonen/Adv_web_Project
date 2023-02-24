@@ -5,8 +5,6 @@ const logoutButton = document.getElementById('logout-button');
 const loginButton = document.getElementById('login-button');
 const registerButton = document.getElementById('register-button');
 
-
-
 async function initializeHeader(){
     const authToken = localStorage.getItem('auth_token');
 

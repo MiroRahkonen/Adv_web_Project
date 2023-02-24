@@ -11,7 +11,7 @@ function storeAuthToken(token){
 
 async function initializeHeader(){
     const authToken = localStorage.getItem('auth_token');
-
+    /*If user is logged in, logout section is shown and login/register buttons are hidden*/
     if(!authToken){
         logoutSection.style.display = 'none';
     }
