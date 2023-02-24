@@ -68,21 +68,43 @@ async function initializeComments(){
         let editbuttons = ''
         if(comment.username === currentUsername){
             editbuttons = `
-            <div class='center-align'>
-                <a class="btn right red" onclick='deleteComment(${index})'>
-                    <i class="material-icons">delete</i>
+            <div>
+                <a class='btn right red' onclick='deleteComment(${index})'>
+                    <i class='material-icons'>delete</i>
                 </a>
-                <a class="btn right" onclick='editComment(${index})'>
-                    <i class="material-icons">edit</i>
+                <a class='btn right' onclick='editComment(${index})'>
+                    <i class='material-icons'>edit</i>
                 </a>
+                <p class='right'>Upvotes: ${comment.upvotes} </p>
             </div>`
+        }
+        else if(currentUsername !== ''){
+            if(comment.upvoters.includes(currentUsername)){
+                editbuttons = `
+                <div>
+                    <a id='remove-upvote-button-${index}' class='btn right orange' onclick='removeUpvote(${index})'>
+                        <i class='material-icons'>thumb_up</i>
+                    </a>
+                    <p class='right'>Upvotes: ${comment.upvotes} </p>
+                </div>`
+            }
+            else{
+                editbuttons = `
+                <div>
+                    <a id='upvote-button-${index}' class='btn right grey' onclick='upvote(${index})'>
+                        <i class='material-icons'>thumb_up</i>
+                    </a>
+                    <p class='right'>Upvotes: ${comment.upvotes} </p>
+                </div>`
+            }
         }
         
 
         commentSection.innerHTML += `
+        
         <div id='${index}' class='comment'>
             ${editbuttons}
-            <p id='username'>${comment.username}</p>
+            <p id='username'>Username: ${comment.username}</p>
             <p id='message'>${comment.message}</p>
             <p id='code' class='code'>${comment.code}</p>
         </div>
@@ -113,13 +135,12 @@ async function postComment(event){
     if(response.status !== 200){
         return errorMessage.innerHTML = 'Error creating the post';
     }
-    else{
+    else if(response.status === 200){
         initializeComments();
     }
 }
 
 async function editComment(i){
-    console.log(comments[i])
     let commentContainer = document.getElementById(i);
     commentContainer.innerHTML = `
         <div>
@@ -149,6 +170,48 @@ async function editComment(i){
         })
         return initializeComments();
     })
+}
+
+
+
+async function upvote(i){
+    let commentDetails = {
+        commentID: comments[i]._id,
+        username: currentUsername,
+        upvote: 1
+    }
+
+    let response = await fetch('/votecomment',{
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(commentDetails)
+    })
+
+    if(response.status === 200){
+        initializeComments();
+    }
+}
+
+async function removeUpvote(i){
+    let commentDetails = {
+        commentID: comments[i]._id,
+        username: currentUsername,
+        upvote: -1
+    }
+
+    let response = await fetch('/votecomment',{
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(commentDetails)
+    })
+
+    if(response.status === 200){
+        initializeComments();
+    }
 }
 
 async function deleteComment(i){

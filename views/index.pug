@@ -1,7 +1,8 @@
 extends layout
 
 block content
-  nav
+  include navbar.pug
+  //nav
     div(class='nav-wrapper')
       ul(id='navbar-links' class='right')
         li
@@ -14,9 +15,14 @@ block content
   div(id='create-post-section' class='create-post')
     p(id="error-message" class='error')
     form(id='post-form')
-      textarea(name='title' form='post-form' class='materialize-textarea' placeholder='Post title' maxlength='50')
-      textarea(name='message' form='post-form' class='materialize-textarea' placeholder='Write your message here...')
-      textarea(name='code' form='post-form' class='materialize-textarea' placeholder='Put your code here...')
+      textarea(name='title' form='post-form' class='materialize-textarea' placeholder='Post title' maxlength='50'  oninput='this.style.height = this.scrollHeight + "px"' required)
+      label(for='title') Title(50 char. max)
+      textarea(name='message' form='post-form' class='materialize-textarea' placeholder='Write your message here...'  oninput='this.style.height = this.scrollHeight + "px"' required)
+      label(for='message') Message
+      textarea(name='code' form='post-form' class='materialize-textarea' placeholder='Put your code here...'  oninput='this.style.height = this.scrollHeight + "px"')
+      label(for='code') Code
+      br
+      br
       input(type='submit' class='btn')
 
   div(id='post-section' class='z-depth-3')

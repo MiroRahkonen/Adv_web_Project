@@ -63,9 +63,9 @@ async function initializePosts(){
         postSection.innerHTML += `
             <div id='${index}' class='post'>
                 ${editbuttons}
-                <a id='title' class='post-link' href="http://localhost:3000/post/${post._id}"> ${post.title} </a>
-                <p id='username'> ${post.username}</p>
-                <p id='message'> ${post.message}</p>
+                <a id='title' class='post-link' href="http://localhost:3000/post/${post._id}">${post.title} </a>
+                <p id='username'>Posted by: ${post.username}</p>
+                <p id='message'>Message: ${post.message}</p>
             </div>
         `
     })

@@ -185,7 +185,7 @@ router.post('/comment',validateToken,(req,res,next)=>{
             username: req.body.username,
             message: req.body.message,
             code: req.body.code,
-            likes: 0
+            upvotes: 0
         },
         (err)=>{
             if(err) throw err;
@@ -203,6 +203,24 @@ router.put('/comment',(req,res,next)=>{
         comment.save();
     })
     res.json('Changes saved');
+})
+
+router.put('/votecomment',(req,res,next)=>{
+    Comments.findOne({_id: req.body.commentID},(err,comment)=>{
+        if(err) res.status(400).json('Upvote failed.');
+        
+        if(req.body.upvote === 1){
+            comment.upvotes += 1;
+            comment.upvoters.push(req.body.username);
+        }
+        else if(req.body.upvote === -1){
+            comment.upvotes += -1;
+            const index = comment.upvoters.indexOf(req.body.username);
+            comment.upvoters.splice(index,1);
+        }
+        comment.save();
+    })
+    res.json('Upvote saved');
 })
 
 //Deleting a comment
