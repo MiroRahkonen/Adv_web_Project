@@ -11,6 +11,7 @@ body {
 
 textarea{
   background-color: white;
+  color: white;
 }
 
 a {
@@ -28,6 +29,7 @@ a {
 .nav-wrapper{
   background-color: #b11016;
 }
+
 
 .post{
   margin-top: 30px;

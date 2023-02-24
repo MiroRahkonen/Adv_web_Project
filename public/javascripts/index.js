@@ -124,11 +124,15 @@ async function editPost(i){
     postContainer.innerHTML = `
         <div>
             <form action='' id='edit-post-form-${i}'>
-                <textarea name='title' form='edit-post-form-${i}' class='materialize-textarea' maxlength='50'>${posts[i].title}</textarea>
+                <textarea name='title' form='edit-post-form-${i}' class='materialize-textarea' maxlength='50' oninput='this.style.height = this.scrollHeight + "px"'>${posts[i].title}</textarea>
+                <label for='title'>Title</label>
                 <p id='username'>${currentUsername}</p>
-                <textarea name='message' form='edit-post-form-${i}' class='materialize-textarea' placeholder='Write your message here...'>${posts[i].message}</textarea>
-                <textarea name='code' form='edit-post-form-${i}' class='materialize-textarea' placeholder='Put useful code here...'>${posts[i].code}</textarea>
-                <input type='submit' class='btn'>
+                <textarea name='message' form='edit-post-form-${i}' class='materialize-textarea' oninput='this.style.height = this.scrollHeight + "px"'>${posts[i].message}</textarea>
+                <label for='message'>Message</label>
+                <textarea name='code' form='edit-post-form-${i}' class='materialize-textarea' oninput='this.style.height = this.scrollHeight + "px"'>${posts[i].code}</textarea>
+                <label for='code'>Code</label>
+                <br><br>
+                <input type='submit' class='btn' value='Save'>
             </form>
         </div>
     `
@@ -154,7 +158,6 @@ async function editPost(i){
         return initializePosts();
     })
 }
-
 
 async function deletePost(i){
     let response = await fetch('/post',{

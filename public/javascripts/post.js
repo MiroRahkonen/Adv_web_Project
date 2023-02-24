@@ -12,6 +12,7 @@ let currentUsername = '';
 const url = window.location.href;
 const spliturl = url.split('/');
 const postID = spliturl[4];
+let postData;
 let comments;
 
 
@@ -49,15 +50,81 @@ async function initializePost(){
         }
     })
     data = await response.json();
+    postData = data;
+    editbuttons = '';
+    if(postData.username === currentUsername){
+        editbuttons = `
+        <div>
+            <a class='btn right red' onclick='deletePost()'>
+                <i class='material-icons'>delete</i>
+            </a>
+            <a class='btn right' onclick='editPost()'>
+                <i class='material-icons'>edit</i>
+            </a>
+        </div>`
+    }
     post.innerHTML = 
     `<div'>
-        <h5 id='title'>${data.title}</h5> 
-        <p id='username'>${data.username}</p>
-        <p id='message'>${data.message}</p>
-        <p id='code' class='code'>${data.code}</p>
+        ${editbuttons}
+        <h5 id='title'>${postData.title}</h5> 
+        <p id='username'>${postData.username}</p>
+        <p id='message'>${postData.message}</p>
+        <pre id='code' class='code'>${postData.code}</pre>
     </div>`
 }
 
+async function deletePost(i){
+    let response = await fetch('/post',{
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({postID: postData._id})
+    })
+
+    if(response.status === 200){
+        window.location.replace('/');
+    }
+}
+
+async function editPost(){
+    post.innerHTML = `
+    <div>
+        <form action='' id='edit-post-form'>
+            <textarea name='title' form='edit-post-form' class='materialize-textarea' maxlength='50' oninput='this.style.height = this.scrollHeight + "px"'>${postData.title}</textarea>
+            <label for='title'>Title</label>
+            <p id='username'>${currentUsername}</p>
+            <textarea name='message' form='edit-post-form' class='materialize-textarea' oninput='this.style.height = this.scrollHeight + "px"'>${postData.message}</textarea>
+            <label for='message'>Message</label>
+            <textarea name='code' form='edit-post-form' class='materialize-textarea' oninput='this.style.height = this.scrollHeight + "px"'>${postData.code}</textarea>
+            <label for='code'>Code</label>
+            <br><br>
+            <input type='submit' class='btn'>
+        </form>
+    </div>
+    `
+    /*Adding an eventlistener to the editing form and the edited data
+    is sent to the server when it is submitted*/
+    document.getElementById(`edit-post-form`).addEventListener('submit',async (event)=>{
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const postDetails = {
+            postID: postData._id,
+            title: formData.get('title'),
+            message: formData.get('message'),
+            code: formData.get('code')
+        }
+
+        let response = await fetch('/post',{
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postDetails)
+        })
+        return location.reload();
+    })
+}
 /*This creates elements for each of the comments in the database, and 
 creates all the buttons and eventlisteners for the buttons*/
 async function initializeComments(){
@@ -106,17 +173,15 @@ async function initializeComments(){
         }
 
         commentSection.innerHTML += `
-        
         <div id='${index}' class='comment'>
             ${editbuttons}
             <p id='username'>Username: ${comment.username}</p>
-            <p id='message'>${comment.message}</p>
+            <p id='message'>Message: ${comment.message}</p>
             <pre id='code' class='code'>${comment.code}</pre>
         </div>
         `
     })
 }
-
 
 async function postComment(event){
     event.preventDefault();
@@ -140,10 +205,9 @@ async function postComment(event){
     if(response.status !== 200){
         return errorMessage.innerHTML = 'Error creating the post';
     }
-    /*In case the comment was successfully posted, the comments section is initialized again
-    to show the new comment*/
+
     else if(response.status === 200){
-        initializeComments();
+        location.reload();
     }
 }
 
@@ -151,10 +215,13 @@ async function editComment(i){
     let commentContainer = document.getElementById(i);
     commentContainer.innerHTML = `
         <div>
-            <p id='username'>${currentUsername}</p>
+            <p id='username'>Username: ${currentUsername}</p>
             <form action='' id='edit-comment-form-${i}'>
-                <textarea name='message' form='edit-comment-form-${i}' class='materialize-textarea' placeholder='Write your message here...'>${comments[i].message}</textarea>
-                <textarea name='code' form='edit-comment-form-${i}' class='materialize-textarea' placeholder='Put useful code here...'>${comments[i].code}</textarea>
+                <textarea name='message' form='edit-comment-form-${i}' class='materialize-textarea' oninput='this.style.height = this.scrollHeight + "px"'>${comments[i].message}</textarea>
+                <label for='Message'>Message</label>
+                <textarea name='code' form='edit-comment-form-${i}' class='materialize-textarea' oninput='this.style.height = this.scrollHeight + "px"'>${comments[i].code}</textarea>
+                <label for='code'>Code</label>
+                <br><br>
                 <input type='submit' class='btn'>
             </form>
         </div>
@@ -175,7 +242,7 @@ async function editComment(i){
             },
             body: JSON.stringify(commentDetails)
         })
-        return initializeComments();
+        return location.reload();
     })
 }
 
